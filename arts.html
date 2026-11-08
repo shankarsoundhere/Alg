@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Arts Subjects - Quiz Master</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7fc;color:#17233c}
+header{background:white;padding:17px;display:flex;align-items:center;gap:15px;box-shadow:0 2px 10px rgba(0,0,0,0.06);position:sticky;top:0;z-index:10}
+.back{font-size:25px;text-decoration:none;color:#1769e0;font-weight:bold;line-height:1}
+.logo{font-size:21px;font-weight:bold;color:#1769e0}
+.logo span{color:#17233c}
+main{max-width:650px;margin:auto;padding:22px 15px}
+.hero{background:linear-gradient(135deg,#1769e0,#5146d8);padding:24px 20px;color:white;border-radius:16px;margin-bottom:24px;box-shadow:0 6px 18px rgba(23,105,224,0.18)}
+.hero h2{font-size:22px;margin-bottom:8px}
+.hero p{font-size:13px;opacity:0.95}
+h3{font-size:18px;margin-bottom:15px;color:#1e293b}
+.list{display:grid;gap:12px}
+.card{background:white;padding:16px 15px;border:1px solid #e8edf5;border-radius:13px;display:flex;align-items:center;gap:13px;text-decoration:none;color:#17233c;box-shadow:0 2px 7px rgba(0,0,0,0.03)}
+.card:active{background:#f8fafc;transform:scale(0.99)}
+.icon-box{width:42px;height:42px;background:#eaf2ff;border-radius:10px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.info{flex:1}
+.info b{font-size:16px;line-height:1.4;display:block;color:#1e293b}
+.info span{font-size:12px;color:#64748b;margin-top:2px;display:block}
+.arrow{font-size:23px;color:#1769e0;font-weight:bold}
+</style>
+</head>
+<body>
+
+<header>
+<a class="back" href="index.html">‹</a>
+<div class="logo">QUIZ <span>MASTER</span></div>
+</header>
+
+<main>
+<div class="hero">
+<h2>🌍 Arts (कला संकाय)</h2>
+<p>अपना पसंदीदा विषय चुनें और अध्याय-वार क्विज की तैयारी करें।</p>
+</div>
+
+<h3>विषय सूची (Subject List)</h3>
+
+<div class="list">
+
+<a class="card" href="chapters.html?subject=history">
+<div class="icon-box">🏛️</div>
+<div class="info">
+<b>इतिहास (History)</b>
+<span>8 अध्याय उपलब्ध</span>
+</div>
+<span class="arrow">›</span>
+</a>
+
+<a class="card" href="chapters.html?subject=geography">
+<div class="icon-box">🌍</div>
+<div class="info">
+<b>भूगोल (Geography)</b>
+<span>6 अध्याय उपलब्ध</span>
+</div>
+<span class="arrow">›</span>
+</a>
+
+<a class="card" href="chapters.html?subject=political-science">
+<div class="icon-box">⚖️</div>
+<div class="info">
+<b>राजनीति विज्ञान (Political Science)</b>
+<span>5 अध्याय उपलब्ध</span>
+</div>
+<span class="arrow">›</span>
+</a>
+
+<a class="card" href="chapters.html?subject=disaster-management">
+<div class="icon-box">🚨</div>
+<div class="info">
+<b>आपदा प्रबंधन (Disaster Management)</b>
+<span>6 अध्याय उपलब्ध</span>
+</div>
+<span class="arrow">›</span>
+</a>
+
+</div>
+</main>
+
+</body>
+</html>
