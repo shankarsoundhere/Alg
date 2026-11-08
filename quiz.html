@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Quiz - Quiz Master</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7fc;color:#17233c}
+header{background:white;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.06);position:sticky;top:0;z-index:10}
+.back{font-size:25px;text-decoration:none;color:#1769e0;font-weight:bold;line-height:1;cursor:pointer}
+.logo{font-size:20px;font-weight:bold;color:#1769e0}
+.logo span{color:#17233c}
+.badge{background:#eaf2ff;color:#1769e0;font-size:12px;font-weight:bold;padding:5px 10px;border-radius:8px}
+main{max-width:650px;margin:auto;padding:18px 15px}
+
+/* QUIZ CARD */
+.quiz-card{background:white;border:1px solid #e8edf5;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.03);margin-bottom:15px}
+.q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid #f1f5f9;padding-bottom:10px}
+.q-num{font-size:13px;font-weight:bold;color:#1769e0;text-transform:uppercase;letter-spacing:.5px}
+.question-text{font-size:16px;font-weight:bold;color:#1e293b;line-height:1.5;margin-bottom:18px}
+
+/* OPTIONS */
+.options{display:grid;gap:11px}
+.opt-btn{background:#f8fafc;border:1.5px solid #e2e8f0;padding:13px 14px;border-radius:12px;font-size:15px;color:#1e293b;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;font-family:inherit;transition:background .2s,border-color .2s}
+.opt-btn:active{transform:scale(0.99)}
+.opt-circle{width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:#475569;display:grid;place-items:center;font-size:12px;font-weight:bold;flex-shrink:0}
+
+/* FEEDBACK STATES */
+.opt-btn.correct{background:#dcfce7;border-color:#22c55e;color:#15803d}
+.opt-btn.correct .opt-circle{background:#22c55e;color:white}
+.opt-btn.wrong{background:#fee2e2;border-color:#ef4444;color:#b91c1c}
+.opt-btn.wrong .opt-circle{background:#ef4444;color:white}
+.opt-btn:disabled{cursor:default}
+
+/* BUTTONS */
+.action-box{margin-top:16px}
+.btn-primary{display:block;width:100%;background:#1769e0;color:white;border:none;padding:14px;border-radius:12px;font-size:15px;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none;box-shadow:0 4px 12px rgba(23,105,224,0.2)}
+.btn-primary:active{transform:scale(0.98)}
+.btn-secondary{background:#eaf2ff;color:#1769e0;box-shadow:none}
+
+/* RESULT CARD */
+.result-card{background:white;border:1px solid #e8edf5;border-radius:16px;padding:26px 18px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,0.04)}
+.result-card h2{font-size:22px;color:#1e293b;margin-bottom:8px}
+.result-card p{font-size:13px;color:#64748b}
+.score-circle{width:115px;height:115px;background:#eaf2ff;border-radius:50%;margin:20px auto;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1769e0}
+.score-circle .val{font-size:32px;font-weight:bold;line-height:1}
+.score-circle .total{font-size:12px;color:#64748b;margin-top:5px}
+
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0}
+.stat-box{background:#f8fafc;border:1px solid #edf0fa;padding:12px 6px;border-radius:12px}
+.stat-box strong{display:block;font-size:19px;margin-bottom:3px}
+.stat-box.green strong{color:#16a34a}
+.stat-box.red strong{color:#dc2626}
+.stat-box.gray strong{color:#64748b}
+.stat-box span{font-size:11px;color:#64748b}
+
+.result-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* MESSAGES */
+.loading, .error-box{text-align:center;padding:35px 20px;background:white;border-radius:14px;border:1px solid #e2e8f0;font-size:15px;color:#64748b}
+.error-box b{display:block;color:#ef4444;font-size:16px;margin-bottom:6px}
+</style>
+</head>
+<body>
+
+<header>
+<a class="back" onclick="confirmExit()">‹</a>
+<div class="logo">QUIZ <span>MASTER</span></div>
+<div class="badge" id="progress-badge">0 / 0</div>
+</header>
+
+<main>
+<div id="quiz-box">
+  <div class="quiz-card">
+    <div class="q-header">
+      <span class="q-num" id="current-badge">प्रश्न 1</span>
+      <span id="set-indicator" style="font-size:12px;color:#64748b;font-weight:bold;">Set 1</span>
+    </div>
+    <div class="question-text" id="q-text">प्रश्न लोड हो रहा है...</div>
+    <div class="options" id="opt-container"></div>
+  </div>
+
+  <div class="action-box">
+    <button class="btn-primary" id="next-btn" style="display:none;">अगला प्रश्न ›</button>
+  </div>
+</div>
+
+<div id="result-box" style="display:none;">
+  <div class="result-card">
+    <h2>🎉 क्विज समाप्त!</h2>
+    <p>आपने यह क्विज सेट सफलता से पूरा किया।</p>
+
+    <div class="score-circle">
+      <div class="val" id="res-score">0</div>
+      <div class="total" id="res-total">कुल प्रश्न</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box green"><strong id="stat-correct">0</strong><span>सही</span></div>
+      <div class="stat-box red"><strong id="stat-wrong">0</strong><span>गलत</span></div>
+      <div class="stat-box gray"><strong id="stat-skipped">0</strong><span>छोड़े</span></div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-primary" onclick="window.location.reload()">पुनः प्रयास</button>
+      <button class="btn-primary btn-secondary" onclick="goToSets()">सेट्स सूची</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const subjectKey = params.get("subject");
+const chapterNum = params.get("chapter");
+const setNum = parseInt(params.get("set")) || 1;
+
+const QUESTIONS_PER_SET = 30;
+let questions = [];
+let currentIndex = 0;
+let score = 0;
+let correctCount = 0;
+let wrongCount = 0;
+
+function confirmExit() {
+  if (confirm("क्या आप सच में क्विज छोड़कर वापस जाना चाहते हैं?")) {
+    goToSets();
+  }
+}
+
+function goToSets() {
+  if (subjectKey && chapterNum) {
+    window.location.href = `sets.html?subject=${encodeURIComponent(subjectKey)}&chapter=${encodeURIComponent(chapterNum)}`;
+  } else {
+    window.location.href = "index.html";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const quizBox = document.getElementById("quiz-box");
+  const setIndicator = document.getElementById("set-indicator");
+
+  if (!subjectKey || !chapterNum) {
+    quizBox.innerHTML = '<div class="error-box"><b>गलत URL!</b>कृपया सेट्स सूची से क्विज शुरू करें।</div>';
+    return;
+  }
+
+  setIndicator.textContent = `Set ${setNum}`;
+
+  const jsonUrl = `data/${subjectKey}/chapter-${chapterNum}.json`;
+
+  fetch(jsonUrl)
+    .then(res => {
+      if (!res.ok) throw new Error("फ़ाइल नहीं मिली");
+      return res.json();
+    })
+    .then(data => {
+      if (!Array.isArray(data) || data.length === 0) {
+        quizBox.innerHTML = '<div class="error-box">इस अध्याय में कोई प्रश्न उपलब्ध नहीं हैं।</div>';
+        return;
+      }
+
+      // 30 प्रश्नों का सेट काटना
+      const startIdx = (setNum - 1) * QUESTIONS_PER_SET;
+      const endIdx = startIdx + QUESTIONS_PER_SET;
+      questions = data.slice(startIdx, endIdx);
+
+      if (questions.length === 0) {
+        quizBox.innerHTML = '<div class="error-box">इस सेट के लिए कोई प्रश्न नहीं मिला।</div>';
+        return;
+      }
+
+      showQuestion(0);
+    })
+    .catch(err => {
+      quizBox.innerHTML = `<div class="error-box"><b>प्रश्न लोड नहीं हो सके!</b>सुनिश्चित करें कि <code>${jsonUrl}</code> फ़ाइल मौजूद है।</div>`;
+    });
+});
+
+function showQuestion(idx) {
+  currentIndex = idx;
+  const q = questions[idx];
+
+  document.getElementById("progress-badge").textContent = `${idx + 1} / ${questions.length}`;
+  document.getElementById("current-badge").textContent = `प्रश्न ${idx + 1}`;
+  document.getElementById("q-text").textContent = q.question;
+
+  const optContainer = document.getElementById("opt-container");
+  optContainer.innerHTML = "";
+  const nextBtn = document.getElementById("next-btn");
+  nextBtn.style.display = "none";
+
+  const labels = ["A", "B", "C", "D"];
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "opt-btn";
+    btn.innerHTML = `<span class="opt-circle">${labels[i] || i + 1}</span><span>${opt}</span>`;
+    btn.onclick = () => checkAnswer(i, q.answer);
+    optContainer.appendChild(btn);
+  });
+}
+
+function checkAnswer(selectedIdx, correctIdx) {
+  const buttons = document.querySelectorAll(".opt-btn");
+  buttons.forEach(btn => btn.disabled = true);
+
+  if (selectedIdx === correctIdx) {
+    buttons[selectedIdx].classList.add("correct");
+    score++;
+    correctCount++;
+  } else {
+    buttons[selectedIdx].classList.add("wrong");
+    if (buttons[correctIdx]) {
+      buttons[correctIdx].classList.add("correct");
+    }
+    wrongCount++;
+  }
+
+  const nextBtn = document.getElementById("next-btn");
+  if (currentIndex < questions.length - 1) {
+    nextBtn.textContent = "अगला प्रश्न ›";
+    nextBtn.onclick = () => showQuestion(currentIndex + 1);
+  } else {
+    nextBtn.textContent = "परिणाम देखें ✓";
+    nextBtn.onclick = showResults;
+  }
+  nextBtn.style.display = "block";
+}
+
+function showResults() {
+  document.getElementById("quiz-box").style.display = "none";
+  document.getElementById("result-box").style.display = "block";
+  document.getElementById("progress-badge").textContent = "समाप्त";
+
+  document.getElementById("res-score").textContent = score;
+  document.getElementById("res-total").textContent = `कुल: ${questions.length}`;
+  document.getElementById("stat-correct").textContent = correctCount;
+  document.getElementById("stat-wrong").textContent = wrongCount;
+  document.getElementById("stat-skipped").textContent = questions.length - (correctCount + wrongCount);
+}
+</script>
+
+</body>
+</html>
