@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -5,6 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#ffffff">
 <title>Chapters - Quiz Master</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#f4f7fc;color:#17233c}
@@ -24,10 +26,11 @@ h3{font-size:18px;margin-bottom:15px;color:#1e293b}
 .info{flex:1}
 .info b{font-size:15px;line-height:1.4;display:block}
 .arrow{font-size:23px;color:#1769e0;font-weight:bold}
-.loading, .error-box{text-align:center;padding:35px 20px;background:white;border-radius:14px;border:1px solid #e2e8f0;font-size:15px;color:#64748b}
+.loading,.error-box{text-align:center;padding:35px 20px;background:white;border-radius:14px;border:1px solid #e2e8f0;font-size:15px;color:#64748b}
 .error-box b{display:block;color:#ef4444;font-size:16px;margin-bottom:6px}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -49,63 +52,115 @@ h3{font-size:18px;margin-bottom:15px;color:#1e293b}
 </main>
 
 <script>
-function goBack() {
-  if (window.history.length > 1) {
+function goBack(){
+  if(window.history.length>1){
     window.history.back();
-  } else {
-    window.location.href = "index.html";
+  }else{
+    window.location.href="index.html";
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const subjectKey = params.get("subject");
-  const heroTitle = document.getElementById("hero-title");
-  const container = document.getElementById("chapter-list");
+document.addEventListener("DOMContentLoaded",async()=>{
 
-  if (!subjectKey) {
-    heroTitle.textContent = "त्रुटि";
-    container.innerHTML = '<div class="error-box"><b>विषय का चयन नहीं हुआ है!</b>कृपया पिछले पृष्ठ पर जाकर विषय चुनें।</div>';
+  const params=new URLSearchParams(window.location.search);
+  const subjectKey=params.get("subject");
+
+  const heroTitle=document.getElementById("hero-title");
+  const container=document.getElementById("chapter-list");
+
+  if(!subjectKey){
+    heroTitle.textContent="त्रुटि";
+    container.innerHTML=
+      '<div class="error-box"><b>विषय का चयन नहीं हुआ है!</b>कृपया पिछले पृष्ठ पर जाकर विषय चुनें।</div>';
     return;
   }
 
-  fetch("data/chapters.json")
-    .then(res => {
-      if (!res.ok) throw new Error("JSON लोड नहीं हो सका");
-      return res.json();
-    })
-    .then(data => {
-      const subject = data[subjectKey];
+  try{
 
-      if (!subject || !subject.chapters) {
-        heroTitle.textContent = "विषय नहीं मिला";
-        container.innerHTML = '<div class="error-box"><b>यह विषय सूची में मौजूद नहीं है!</b>कृपया डेटा की जाँच करें।</div>';
-        return;
-      }
+    const res=await fetch("data/chapters.json");
 
-      heroTitle.textContent = subject.name;
-      document.title = `${subject.name} - Quiz Master`;
-      container.innerHTML = "";
+    if(!res.ok){
+      throw new Error("chapters.json लोड नहीं हो सका");
+    }
 
-      Object.entries(subject.chapters).forEach(([num, name]) => {
-        const card = document.createElement("a");
-        card.className = "card";
-        card.href = `sets.html?subject=${encodeURIComponent(subjectKey)}&chapter=${encodeURIComponent(num)}`;
+    const data=await res.json();
 
-        const padNum = String(num).padStart(2, '0');
+    // नए JSON फॉर्मेट में विषय सीधे Array है
+    const chapters=data[subjectKey];
 
-        card.innerHTML = `
-          <div class="number">${padNum}</div>
-          <div class="info"><b>${name}</b></div>
-          <span class="arrow">›</span>
-        `;
-        container.appendChild(card);
-      });
-    })
-    .catch(err => {
-      heroTitle.textContent = "डेटा लोड नहीं हुआ";
-      container.innerHTML = '<div class="error-box"><b>डेटा लोड करने में समस्या आई!</b>जाँचें कि <code>data/chapters.json</code> फ़ाइल सही जगह पर है।</div>';
+    if(!Array.isArray(chapters) || chapters.length===0){
+      heroTitle.textContent="विषय नहीं मिला";
+      container.innerHTML=
+        '<div class="error-box"><b>यह विषय सूची में मौजूद नहीं है!</b>कृपया chapters.json की जाँच करें।</div>';
+      return;
+    }
+
+    // विषय का नाम
+    const subjectNames={
+      "history":"इतिहास",
+      "geography":"भूगोल",
+      "economics":"अर्थशास्त्र",
+      "political-science":"राजनीति विज्ञान",
+      "disaster-management":"आपदा प्रबंधन",
+      "physics":"भौतिक विज्ञान",
+      "chemistry":"रसायन विज्ञान",
+      "biology":"जीव विज्ञान",
+      "gadya-bhag":"गद्य भाग",
+      "padya-bhag":"पद्य भाग",
+      "hindi-bhag-2":"हिंदी भाग 2",
+      "sanskrit":"संस्कृत"
+    };
+
+    const subjectName=subjectNames[subjectKey] || subjectKey;
+
+    heroTitle.textContent=subjectName;
+    document.title=`${subjectName} - Quiz Master`;
+
+    container.innerHTML="";
+
+    chapters.forEach((name,index)=>{
+
+      const chapterNum=index+1;
+
+      const card=document.createElement("a");
+      card.className="card";
+
+      card.href=
+        `sets.html?subject=${encodeURIComponent(subjectKey)}&chapter=${chapterNum}`;
+
+      const number=document.createElement("div");
+      number.className="number";
+      number.textContent=String(chapterNum).padStart(2,"0");
+
+      const info=document.createElement("div");
+      info.className="info";
+
+      const title=document.createElement("b");
+      title.textContent=name;
+
+      info.appendChild(title);
+
+      const arrow=document.createElement("span");
+      arrow.className="arrow";
+      arrow.textContent="›";
+
+      card.appendChild(number);
+      card.appendChild(info);
+      card.appendChild(arrow);
+
+      container.appendChild(card);
     });
+
+  }catch(err){
+
+    console.error(err);
+
+    heroTitle.textContent="डेटा लोड नहीं हुआ";
+
+    container.innerHTML=
+      '<div class="error-box"><b>डेटा लोड करने में समस्या आई!</b>जाँचें कि data/chapters.json सही जगह पर है।</div>';
+  }
+
 });
 </script>
 
