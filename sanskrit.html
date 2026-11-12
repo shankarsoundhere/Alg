@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#102b50">
+<title>Sanskrit - Quiz Master</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f3f6fb;
+  color:#17243a;
+}
+header{
+  background:linear-gradient(135deg,#102b50,#2465a5);
+  color:white;
+  padding:25px 15px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+header h1{margin:0;font-size:27px}
+header p{margin:8px 0 0;font-size:12px;letter-spacing:2px}
+.back{
+  display:inline-block;
+  margin:18px 15px 5px;
+  color:#2465a5;
+  text-decoration:none;
+  font-weight:bold;
+}
+.container{padding:15px;max-width:650px;margin:auto}
+.heading{font-size:19px;font-weight:bold;margin:12px 0 15px}
+.subject{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  background:white;
+  padding:18px;
+  margin-bottom:13px;
+  border-radius:14px;
+  text-decoration:none;
+  color:#17243a;
+  box-shadow:0 4px 14px rgba(0,0,0,.06);
+  transition:.25s;
+  animation:show .5s ease both;
+}
+.subject:active{transform:scale(.97)}
+.subject .emoji{font-size:30px}
+.subject h3{margin:0;font-size:17px}
+.subject p{margin:5px 0 0;color:#718096;font-size:12px}
+.arrow{margin-left:auto;color:#2465a5;font-size:23px}
+footer{text-align:center;padding:25px;color:#8793a5;font-size:12px}
+@keyframes show{
+  from{opacity:0;transform:translateY(15px)}
+  to{opacity:1;transform:translateY(0)}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🕉️ संस्कृत</h1>
+  <p>LEARN • PRACTICE • ACHIEVE</p>
+</header>
+
+<a class="back" href="index.html">← वापस जाएँ</a>
+
+<div class="container">
+  <div class="heading">विषय चुनें</div>
+  <div id="subjects"></div>
+</div>
+
+<footer>QUIZ MASTER</footer>
+
+<script>
+const subjects=[
+  {
+    key:"sanskrit",
+    name:"संस्कृत",
+    icon:"🕉️",
+    description:"Sanskrit"
+  }
+];
+
+const container=document.getElementById("subjects");
+
+subjects.forEach((subject,index)=>{
+  const card=document.createElement("a");
+  card.className="subject";
+  card.href="chapters.html?subject="+encodeURIComponent(subject.key);
+  card.style.animationDelay=(index*.1)+"s";
+
+  card.innerHTML=`
+    <div class="emoji">${subject.icon}</div>
+    <div>
+      <h3>${subject.name}</h3>
+      <p>${subject.description}</p>
+    </div>
+    <div class="arrow">›</div>
+  `;
+
+  container.appendChild(card);
+});
+</script>
+
+</body>
+</html>
