@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#ffffff">
 <title>Quiz Sets - Quiz Master</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#f4f7fc;color:#17233c}
@@ -25,10 +26,11 @@ h3{font-size:18px;margin-bottom:15px;color:#1e293b}
 .info b{font-size:16px;line-height:1.4;display:block;color:#1e293b}
 .info span{font-size:12px;color:#64748b;margin-top:2px;display:block}
 .arrow{font-size:23px;color:#1769e0;font-weight:bold}
-.loading, .error-box{text-align:center;padding:35px 20px;background:white;border-radius:14px;border:1px solid #e2e8f0;font-size:15px;color:#64748b}
+.loading,.error-box{text-align:center;padding:35px 20px;background:white;border-radius:14px;border:1px solid #e2e8f0;font-size:15px;color:#64748b}
 .error-box b{display:block;color:#ef4444;font-size:16px;margin-bottom:6px}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -50,90 +52,123 @@ h3{font-size:18px;margin-bottom:15px;color:#1e293b}
 </main>
 
 <script>
-function goBack() {
-  if (window.history.length > 1) {
+function goBack(){
+  if(window.history.length>1){
     window.history.back();
-  } else {
-    window.location.href = "index.html";
+  }else{
+    window.location.href="index.html";
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const subjectKey = params.get("subject");
-  const chapterNum = params.get("chapter");
+document.addEventListener("DOMContentLoaded",async()=>{
 
-  const titleEl = document.getElementById("chapter-title");
-  const infoEl = document.getElementById("total-info");
-  const container = document.getElementById("sets-container");
+  const params=new URLSearchParams(window.location.search);
+  const subjectKey=params.get("subject");
+  const chapterNum=Number(params.get("chapter"));
 
-  const QUESTIONS_PER_SET = 30;
+  const titleEl=document.getElementById("chapter-title");
+  const infoEl=document.getElementById("total-info");
+  const container=document.getElementById("sets-container");
 
-  if (!subjectKey || !chapterNum) {
-    titleEl.textContent = "त्रुटि";
-    container.innerHTML = '<div class="error-box"><b>गलत लिंक!</b>कृपया चैप्टर सूची से पुनः प्रयास करें।</div>';
+  if(!subjectKey || !Number.isInteger(chapterNum) || chapterNum<1){
+    titleEl.textContent="त्रुटि";
+    container.innerHTML='<div class="error-box"><b>गलत लिंक!</b>कृपया चैप्टर सूची से पुनः प्रयास करें।</div>';
     return;
   }
 
-  // 1. विषय और चैप्टर का नाम प्राप्त करना
-  fetch("data/chapters.json")
-    .then(res => res.json())
-    .then(chaptersData => {
-      if (chaptersData[subjectKey] && chaptersData[subjectKey].chapters[chapterNum]) {
-        titleEl.textContent = `अध्याय ${chapterNum} : ${chaptersData[subjectKey].chapters[chapterNum]}`;
-      } else {
-        titleEl.textContent = `अध्याय ${chapterNum}`;
-      }
-    })
-    .catch(() => {
-      titleEl.textContent = `अध्याय ${chapterNum}`;
-    });
+  try{
 
-  // 2. चैप्टर की JSON फ़ाइल से प्रश्नों की गिनती करना
-  const chapterJsonUrl = `data/${subjectKey}/chapter-${chapterNum}.json`;
+    // तीनों JSON फाइलों से डेटा प्राप्त करें
+    const [chaptersRes,settingsRes,questionsRes]=await Promise.all([
+      fetch("data/chapters.json"),
+      fetch("data/settings.json"),
+      fetch(`data/${subjectKey}/chapter-${chapterNum}.json`)
+    ]);
 
-  fetch(chapterJsonUrl)
-    .then(res => {
-      if (!res.ok) throw new Error("फ़ाइल नहीं मिली");
-      return res.json();
-    })
-    .then(questions => {
-      const totalQuestions = questions.length;
+    if(!chaptersRes.ok) throw new Error("chapters.json नहीं मिली");
+    if(!settingsRes.ok) throw new Error("settings.json नहीं मिली");
+    if(!questionsRes.ok) throw new Error("अध्याय की प्रश्न फाइल नहीं मिली");
 
-      if (!Array.isArray(questions) || totalQuestions === 0) {
-        infoEl.textContent = "कुल प्रश्न: 0";
-        container.innerHTML = '<div class="error-box">इस अध्याय में अभी कोई प्रश्न उपलब्ध नहीं हैं।</div>';
-        return;
-      }
+    const chaptersData=await chaptersRes.json();
+    const settings=await settingsRes.json();
+    const chapterData=await questionsRes.json();
 
-      // सेट्स की कुल संख्या (हर 30 प्रश्न पर एक सेट)
-      const totalSets = Math.ceil(totalQuestions / QUESTIONS_PER_SET);
-      infoEl.textContent = `कुल प्रश्न: ${totalQuestions} | कुल सेट्स: ${totalSets}`;
-      container.innerHTML = "";
+    // अध्याय का नाम
+    const chapterName=chaptersData[subjectKey]?.[chapterNum-1];
 
-      for (let setIdx = 1; setIdx <= totalSets; setIdx++) {
-        const startQ = (setIdx - 1) * QUESTIONS_PER_SET + 1;
-        const endQ = Math.min(setIdx * QUESTIONS_PER_SET, totalQuestions);
+    titleEl.textContent=chapterName
+      ? `अध्याय ${chapterNum} : ${chapterName}`
+      : `अध्याय ${chapterNum}`;
 
-        const card = document.createElement("a");
-        card.className = "card";
-        card.href = `quiz.html?subject=${encodeURIComponent(subjectKey)}&chapter=${encodeURIComponent(chapterNum)}&set=${setIdx}`;
+    // सेटिंग से प्रति सेट प्रश्नों की संख्या
+    const QUESTIONS_PER_SET=Number(settings.questionsPerSet);
 
-        card.innerHTML = `
-          <div class="number">${String(setIdx).padStart(2, '0')}</div>
-          <div class="info">
-            <b>Quiz Set ${setIdx}</b>
-            <span>प्रश्न संख्या: ${startQ} से ${endQ} तक</span>
-          </div>
-          <span class="arrow">›</span>
-        `;
-        container.appendChild(card);
-      }
-    })
-    .catch(err => {
-      infoEl.textContent = "डेटा लोड नहीं हो सका";
-      container.innerHTML = `<div class="error-box"><b>प्रश्नों की फ़ाइल नहीं मिली!</b>सुनिश्चित करें कि <code>${chapterJsonUrl}</code> फ़ाइल बनी हुई है।</div>`;
-    });
+    if(!Number.isInteger(QUESTIONS_PER_SET) || QUESTIONS_PER_SET<1){
+      throw new Error("settings.json में questionsPerSet गलत है");
+    }
+
+    // नए JSON फॉर्मेट से प्रश्न प्राप्त करें
+    const questions=chapterData.questions;
+
+    if(!Array.isArray(questions)){
+      throw new Error("प्रश्न JSON का फॉर्मेट गलत है");
+    }
+
+    const totalQuestions=questions.length;
+
+    if(totalQuestions===0){
+      infoEl.textContent="कुल प्रश्न: 0";
+      container.innerHTML='<div class="error-box">इस अध्याय में अभी कोई प्रश्न उपलब्ध नहीं हैं।</div>';
+      return;
+    }
+
+    // अपने आप कुल सेट बनाएं
+    const totalSets=Math.ceil(totalQuestions/QUESTIONS_PER_SET);
+
+    infoEl.textContent=
+      `कुल प्रश्न: ${totalQuestions} | कुल सेट्स: ${totalSets}`;
+
+    container.innerHTML="";
+
+    for(let setIdx=1;setIdx<=totalSets;setIdx++){
+
+      const startQ=(setIdx-1)*QUESTIONS_PER_SET+1;
+      const endQ=Math.min(setIdx*QUESTIONS_PER_SET,totalQuestions);
+
+      const card=document.createElement("a");
+      card.className="card";
+
+      card.href=
+        `quiz.html?subject=${encodeURIComponent(subjectKey)}&chapter=${chapterNum}&set=${setIdx}`;
+
+      card.innerHTML=`
+        <div class="number">${String(setIdx).padStart(2,"0")}</div>
+
+        <div class="info">
+          <b>${settings.setName || "Quiz Set"} ${setIdx}</b>
+          <span>प्रश्न संख्या: ${startQ} से ${endQ} तक (${endQ-startQ+1} प्रश्न)</span>
+        </div>
+
+        <span class="arrow">›</span>
+      `;
+
+      container.appendChild(card);
+    }
+
+  }catch(err){
+
+    console.error(err);
+
+    infoEl.textContent="डेटा लोड नहीं हो सका";
+
+    container.innerHTML=`
+      <div class="error-box">
+        <b>डेटा लोड करने में समस्या!</b>
+        ${err.message}
+      </div>
+    `;
+  }
+
 });
 </script>
 
