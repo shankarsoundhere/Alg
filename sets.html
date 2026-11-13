@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -78,7 +79,6 @@ document.addEventListener("DOMContentLoaded",async()=>{
 
   try{
 
-    // तीनों JSON फाइलों से डेटा प्राप्त करें
     const [chaptersRes,settingsRes,questionsRes]=await Promise.all([
       fetch("data/chapters.json"),
       fetch("data/settings.json"),
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
 
     if(!chaptersRes.ok) throw new Error("chapters.json नहीं मिली");
     if(!settingsRes.ok) throw new Error("settings.json नहीं मिली");
-    if(!questionsRes.ok) throw new Error("अध्याय की प्रश्न फाइल नहीं मिली");
+    if(!questionsRes.ok) throw new Error(`chapter-${chapterNum}.json नहीं मिली`);
 
     const chaptersData=await chaptersRes.json();
     const settings=await settingsRes.json();
@@ -100,18 +100,33 @@ document.addEventListener("DOMContentLoaded",async()=>{
       ? `अध्याय ${chapterNum} : ${chapterName}`
       : `अध्याय ${chapterNum}`;
 
-    // सेटिंग से प्रति सेट प्रश्नों की संख्या
+    // सेटिंग से प्रश्नों की संख्या
     const QUESTIONS_PER_SET=Number(settings.questionsPerSet);
 
     if(!Number.isInteger(QUESTIONS_PER_SET) || QUESTIONS_PER_SET<1){
       throw new Error("settings.json में questionsPerSet गलत है");
     }
 
-    // नए JSON फॉर्मेट से प्रश्न प्राप्त करें
-    const questions=chapterData.questions;
+    // दोनों JSON फॉर्मेट सपोर्ट
+    const questions=Array.isArray(chapterData)
+      ? chapterData
+      : chapterData.questions;
 
     if(!Array.isArray(questions)){
       throw new Error("प्रश्न JSON का फॉर्मेट गलत है");
+    }
+
+    // प्रश्नों की जाँच
+    if(!questions.every(q =>
+      q &&
+      typeof q.q==="string" &&
+      Array.isArray(q.o) &&
+      q.o.length===4 &&
+      Number.isInteger(q.a) &&
+      q.a>=0 &&
+      q.a<=3
+    )){
+      throw new Error("कुछ प्रश्नों का फॉर्मेट गलत है");
     }
 
     const totalQuestions=questions.length;
@@ -141,16 +156,30 @@ document.addEventListener("DOMContentLoaded",async()=>{
       card.href=
         `quiz.html?subject=${encodeURIComponent(subjectKey)}&chapter=${chapterNum}&set=${setIdx}`;
 
-      card.innerHTML=`
-        <div class="number">${String(setIdx).padStart(2,"0")}</div>
+      const number=document.createElement("div");
+      number.className="number";
+      number.textContent=String(setIdx).padStart(2,"0");
 
-        <div class="info">
-          <b>${settings.setName || "Quiz Set"} ${setIdx}</b>
-          <span>प्रश्न संख्या: ${startQ} से ${endQ} तक (${endQ-startQ+1} प्रश्न)</span>
-        </div>
+      const info=document.createElement("div");
+      info.className="info";
 
-        <span class="arrow">›</span>
-      `;
+      const name=document.createElement("b");
+      name.textContent=`${settings.setName || "Quiz Set"} ${setIdx}`;
+
+      const detail=document.createElement("span");
+      detail.textContent=
+        `प्रश्न संख्या: ${startQ} से ${endQ} तक (${endQ-startQ+1} प्रश्न)`;
+
+      info.appendChild(name);
+      info.appendChild(detail);
+
+      const arrow=document.createElement("span");
+      arrow.className="arrow";
+      arrow.textContent="›";
+
+      card.appendChild(number);
+      card.appendChild(info);
+      card.appendChild(arrow);
 
       container.appendChild(card);
     }
