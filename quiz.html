@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -5,644 +6,437 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#102b50">
 <title>Quiz Master</title>
-
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f3f6fb;color:#17243a;font-family:Arial,sans-serif}
-header{background:linear-gradient(135deg,#102b50,#2465a5);color:white;padding:20px 16px;border-radius:0 0 22px 22px}
-header small{letter-spacing:2px;color:#c8dcf5}
-header h2{font-size:21px;margin:10px 0 4px}
-header p{margin:0;color:#dceaff;font-size:13px}
-main{max-width:650px;margin:18px auto;padding:0 13px}
-.card{background:white;border-radius:15px;padding:17px;margin-bottom:14px;box-shadow:0 3px 15px #17243a0b}
-.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.timer{background:#fff0e9;color:#c34b22;padding:9px 12px;border-radius:9px;font-weight:bold}
-.progress{height:7px;background:#e8edf4;border-radius:20px;margin-top:15px;overflow:hidden}
-.bar{height:100%;width:0;background:#2375c5;transition:.2s}
-.palette{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:14px}
-.pal{border:1px solid #dce3ed;background:white;border-radius:8px;padding:10px 0;font-weight:bold;color:#536174}
-.pal.answered{background:#d9f5e4;border-color:#62bd83;color:#16743a}
-.pal.current{outline:2px solid #2878c8;color:#2164aa}
-.pal.review{background:#fff0cf;border-color:#e8b64c;color:#865d00}
-.qnum{color:#2671b8;font-weight:bold;font-size:13px}
-.question{font-size:19px;line-height:1.55;margin:12px 0 18px}
-.option{border:1px solid #dce3ed;border-radius:11px;padding:13px;margin:10px 0;display:flex;gap:10px;align-items:center;cursor:pointer;font-size:15px;line-height:1.4}
-.option.selected{border:2px solid #2878c8;background:#edf5ff}
-.letter{width:28px;height:28px;flex-shrink:0;border-radius:8px;background:#edf1f6;display:grid;place-items:center;font-weight:bold}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
-button{border:0;border-radius:9px;padding:12px 15px;font-size:14px;font-weight:bold;cursor:pointer}
-.primary{background:#2169ad;color:white}
-.secondary{background:#edf2f8;color:#34445b}
-.reviewbtn{background:#fff0cf;color:#805900}
-.submit{background:#16834a;color:white}
-button:disabled{opacity:.4}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:#68778a;margin-top:12px}
-.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px}
-.hidden{display:none}
-.loading{text-align:center;padding:35px 15px;color:#526176}
-.error{color:#bd3030;background:#fff0f0;border:1px solid #ffd1d1;padding:15px;border-radius:10px;line-height:1.6}
-.result{text-align:center}
-.result-top{background:linear-gradient(135deg,#e9f8ef,#f3fbf6);padding:20px 12px;border-radius:13px}
-.result-icon{font-size:38px}
-.result-title{font-size:21px;margin:8px 0;color:#176b3a}
-.score{font-size:43px;font-weight:bold;color:#16834a;margin:12px}
-.percent{font-size:14px;color:#526176}
-.performance{display:inline-block;background:#d9f5e4;color:#16743a;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:bold;margin-top:8px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:17px}
-.stat{background:#f3f6fa;padding:14px 5px;border-radius:10px;font-size:12px;color:#66758b}
-.stat b{display:block;font-size:23px;margin-bottom:5px;color:#17243a}
-.stat.correct b{color:#16834a}
-.stat.wrong b{color:#d34d4d}
-.stat.skipped b{color:#b17a12}
-.result-heading{font-size:18px;margin:5px 0 14px}
-.filter-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}
-.filter-btn{background:#edf2f8;color:#45546a;padding:9px 12px;font-size:12px}
-.filter-btn.active{background:#2169ad;color:white}
-.explain{border:1px solid #e1e7ef;border-radius:12px;padding:13px;margin:12px 0}
-.explain.correct-card{border-left:5px solid #22a05a;background:#fbfffc}
-.explain.wrong-card{border-left:5px solid #dc4c4c;background:#fffafa}
-.explain.skip-card{border-left:5px solid #d59b24;background:#fffdf8}
-.review-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
-.q-label{font-size:12px;color:#64748b;font-weight:bold}
-.status{font-size:11px;padding:6px 9px;border-radius:20px;font-weight:bold}
-.status.good{background:#d9f5e4;color:#16743a}
-.status.bad{background:#ffe1e1;color:#bd3030}
-.status.skip{background:#fff0cf;color:#8b640c}
-.review-question{font-size:15px;line-height:1.6;font-weight:bold;margin-bottom:12px}
-.review-option{padding:10px;border-radius:8px;border:1px solid #e1e7ef;margin:7px 0;font-size:13px;line-height:1.5;display:flex;gap:8px}
-.review-option.correct-option{background:#e4f8eb;border-color:#65bd83;color:#146c36}
-.review-option.wrong-option{background:#ffe8e8;border-color:#e78b8b;color:#a92d2d}
-.review-option .letter{width:24px;height:24px;font-size:12px}
-.answer-info{font-size:13px;line-height:1.7;margin-top:12px;padding:10px;border-radius:8px;background:#f2f5f9}
-.answer-info .your{color:#c03939}
-.answer-info .right{color:#16834a;font-weight:bold}
-.no-result{text-align:center;padding:20px;color:#68778a;font-size:14px}
-.result-actions{display:flex;gap:9px;margin-top:15px}
-.result-actions button{flex:1}
-@media(max-width:380px){
-.palette{grid-template-columns:repeat(5,1fr)}
+header{background:linear-gradient(135deg,#102b50,#2465a5);color:white;padding:17px;text-align:center}
+header h2{margin:0;font-size:22px}
+header p{margin:5px 0 0;font-size:11px;letter-spacing:2px}
+.container{max-width:850px;margin:auto;padding:14px}
+.card{background:white;border-radius:13px;padding:16px;margin-bottom:14px;box-shadow:0 3px 12px #0000000c}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.timer{font-size:18px;font-weight:bold;color:#d32f2f}
+.progress{height:7px;background:#e4eaf2;border-radius:10px;margin-top:13px;overflow:hidden}
+.progress div{height:100%;background:#2465a5;width:0}
+.question{font-size:19px;line-height:1.6;font-weight:bold;margin:18px 0}
+.option{display:block;width:100%;text-align:left;padding:13px;margin:9px 0;border:1px solid #dce3ed;border-radius:9px;background:#fff;font-size:16px;color:#17243a}
+.option.selected{border:2px solid #2465a5;background:#edf5ff}
+.option.correct{border:2px solid #229954;background:#eaf8ef}
+.option.wrong{border:2px solid #e53935;background:#fff0ef}
+.option:disabled{opacity:1}
+button{border:0;border-radius:8px;padding:11px 16px;font-size:15px;font-weight:bold;cursor:pointer}
+.primary{background:#2465a5;color:white}
+.secondary{background:#e8eef6;color:#173b64}
+.danger{background:#d93636;color:white}
+.success{background:#16834a;color:white}
+.nav{display:flex;gap:9px;justify-content:space-between;margin-top:16px}
+.nav button{flex:1}
+.palette{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px}
+.palette button{padding:10px 0;background:#e8eef6;color:#173b64}
+.palette button.answered{background:#d5ebdc;color:#176b37}
+.palette button.review{background:#fff0c2;color:#795600}
+.palette button.current{outline:2px solid #2465a5}
+.small{font-size:13px;color:#66758a}
+.review-btn{margin-top:12px;width:100%}
+#quizArea,#resultArea{display:none}
+.result-stat{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat{background:#f3f6fb;padding:13px;border-radius:9px;text-align:center}
+.stat b{display:block;font-size:23px;margin-bottom:4px}
+.filter{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.filter button.active{background:#2465a5;color:white}
+.review-item{border-bottom:1px solid #e5eaf1;padding:13px 0;line-height:1.6}
+.review-item:last-child{border:0}
+#loading{text-align:center;padding:35px}
+@media(max-width:420px){
+.container{padding:10px}
 .question{font-size:17px}
-.stats{gap:5px}
-.stat{padding:11px 3px}
+.option{font-size:15px}
+.palette{grid-template-columns:repeat(5,1fr)}
 }
 </style>
 </head>
-
 <body>
 
 <header>
-<small>LEARN • PRACTICE • ACHIEVE</small>
-<h2 id="pageTitle">Quiz Master</h2>
-<p id="pageSubtitle">Loading Quiz...</p>
+<h2>Quiz Master</h2>
+<p>LEARN • PRACTICE • ACHIEVE</p>
 </header>
 
-<main>
+<div class="container">
+<div id="loading" class="card">क्विज लोड हो रहा है...</div>
 
-<div id="loadingArea" class="card loading">
-क्विज लोड हो रहा है...
+<div id="quizArea">
+<div class="card">
+<div class="top">
+<b id="setTitle">Quiz Set</b>
+<span class="timer" id="timer">30:00</span>
 </div>
-
-<div id="errorArea" class="card hidden"></div>
-
-<section id="quizArea" class="hidden">
+<div class="progress"><div id="progressBar"></div></div>
+<div class="top small" style="margin-top:9px">
+<span id="questionCount">प्रश्न 1</span>
+<span id="answeredCount">हल किए: 0</span>
+</div>
+</div>
 
 <div class="card">
 <div class="top">
-<b id="counter">प्रश्न 1 / 30</b>
-<div class="timer" id="timer">30:00</div>
+<span class="small" id="questionNumber">प्रश्न 1</span>
+<span class="small" id="reviewStatus"></span>
 </div>
-<div class="progress"><div class="bar" id="bar"></div></div>
-<div class="legend">
-<span><i class="dot" style="background:#62bd83"></i>उत्तर दिया</span>
-<span><i class="dot" style="background:#fff0cf"></i>Review</span>
-<span><i class="dot" style="background:#dce3ed"></i>बाकी</span>
+<div class="question" id="questionText"></div>
+<div id="options"></div>
+
+<button class="secondary review-btn" id="reviewButton" onclick="toggleReview()">★ बाद में देखें</button>
+
+<div class="nav">
+<button class="secondary" onclick="previousQuestion()">← पिछला</button>
+<button class="primary" onclick="nextQuestion()">अगला →</button>
 </div>
+</div>
+
+<div class="card">
+<b>प्रश्न सूची</b>
+<p class="small">हरा = हल किया | पीला = बाद में देखें</p>
 <div class="palette" id="palette"></div>
 </div>
 
 <div class="card">
-<div class="qnum" id="qnum">QUESTION 01</div>
-<div class="question" id="question"></div>
-<div id="options"></div>
-<div class="actions">
-<button class="secondary" id="prevBtn" onclick="previous()">← पिछला</button>
-<button class="reviewbtn" onclick="toggleReview()">★ Review</button>
-<button class="primary" id="nextBtn" onclick="next()">अगला →</button>
+<button class="danger" style="width:100%" onclick="confirmSubmit()">क्विज जमा करें</button>
 </div>
+</div>
+
+<div id="resultArea">
+<div class="card">
+<button class="success" style="width:100%;margin-bottom:15px" onclick="restartQuiz()">↻ फिर से प्रयास करें</button>
+<h2 style="margin:0 0 14px">आपका परिणाम</h2>
+<div class="result-stat">
+<div class="stat"><b id="score">0</b><span>प्राप्त अंक</span></div>
+<div class="stat"><b id="percentage">0%</b><span>प्रतिशत</span></div>
+<div class="stat"><b id="correct">0</b><span>सही उत्तर</span></div>
+<div class="stat"><b id="wrong">0</b><span>गलत उत्तर</span></div>
+<div class="stat"><b id="skipped">0</b><span>छोड़े गए</span></div>
+<div class="stat"><b id="total">0</b><span>कुल प्रश्न</span></div>
+</div>
+<h3 id="performance"></h3>
+<button class="secondary" style="width:100%" onclick="location.href=`sets.html?subject=${encodeURIComponent(subject)}&chapter=${chapter}`">सेट सूची पर जाएँ</button>
 </div>
 
 <div class="card">
-<div class="top">
-<span style="font-size:13px;color:#66758b" id="saveStatus">उत्तर अपने आप सेव हो रहे हैं</span>
-<button class="submit" onclick="submitQuiz()">Quiz Submit करें</button>
+<h3 style="margin-top:0">उत्तर की समीक्षा</h3>
+<div class="filter">
+<button class="secondary active" onclick="filterReview('all',this)">सभी</button>
+<button class="secondary" onclick="filterReview('wrong',this)">गलत</button>
+<button class="secondary" onclick="filterReview('correct',this)">सही</button>
+<button class="secondary" onclick="filterReview('skipped',this)">छोड़े गए</button>
 </div>
-</div>
-
-</section>
-
-<section id="resultArea" class="hidden">
-
-<div class="card result">
-<div class="result-top">
-<div class="result-icon" id="resultIcon">🏆</div>
-<h2 class="result-title" id="resultTitle">शानदार प्रदर्शन!</h2>
-<div class="score" id="score">0 / 30</div>
-<div class="percent" id="percent">0% अंक</div>
-<div class="performance" id="performance">अच्छा प्रयास</div>
-</div>
-
-<div class="stats">
-<div class="stat correct"><b id="correct">0</b>सही उत्तर</div>
-<div class="stat wrong"><b id="wrong">0</b>गलत उत्तर</div>
-<div class="stat skipped"><b id="skipped">0</b>छोड़े गए</div>
-</div>
-</div>
-
-<div class="card">
-<h3 class="result-heading">📋 प्रश्नों की समीक्षा</h3>
-
-<div class="filter-row">
-<button class="filter-btn active" onclick="setFilter('all',this)">सभी प्रश्न</button>
-<button class="filter-btn" onclick="setFilter('wrong',this)">गलत</button>
-<button class="filter-btn" onclick="setFilter('correct',this)">सही</button>
-<button class="filter-btn" onclick="setFilter('skip',this)">छोड़े गए</button>
-</div>
-
 <div id="reviewList"></div>
-
-<div class="result-actions">
-<button class="primary" onclick="restart()">फिर से प्रयास करें</button>
 </div>
 </div>
-
-</section>
-</main>
+</div>
 
 <script>
-"use strict";
-
 const params=new URLSearchParams(location.search);
-
-const subject=(params.get("subject")||"geography").toLowerCase();
+const subject=params.get("subject")||"geography";
 const chapter=params.get("chapter")||"1";
-const set=params.get("set")||"1";
+const setNumber=parseInt(params.get("set")||"1",10);
 
-const jsonPath=`data/${encodeURIComponent(subject)}/chapter-${encodeURIComponent(chapter)}-set-${encodeURIComponent(set)}.json`;
-const storageKey=`quiz_${subject}_${chapter}_${set}`;
+let settings={},allQuestions=[],questions=[];
+let answers=[],marked=[],current=0;
+let duration=30,endTime=0,timerInterval=null;
+let finished=false,storageKey="";
 
-let quizData=null;
-let questions=[];
-let current=0;
-let answers=[];
-let marked=[];
-let endTime=0;
-let finished=false;
-let tick=null;
-let activeFilter="all";
-let duration=30;
-
-function $(id){
- return document.getElementById(id);
-}
+const $=id=>document.getElementById(id);
 
 function showError(message){
- $("loadingArea").classList.add("hidden");
- $("quizArea").classList.add("hidden");
- $("resultArea").classList.add("hidden");
- $("errorArea").classList.remove("hidden");
- $("errorArea").innerHTML="";
- const box=document.createElement("div");
- box.className="error";
- box.textContent=message;
- $("errorArea").appendChild(box);
+$("loading").innerHTML="<b style='color:#d32f2f'>क्विज लोड नहीं हो सका!</b><p>"+message+"</p>";
 }
 
-function validateData(data){
- if(!data || !Array.isArray(data.questions) || data.questions.length===0){
-  throw new Error("JSON में questions की सूची नहीं मिली।");
- }
+async function getJSON(url){
+const response=await fetch(url,{cache:"no-store"});
+if(!response.ok)throw new Error("फाइल नहीं मिली: "+url);
+return await response.json();
+}
 
- data.questions.forEach((q,i)=>{
-  if(typeof q.q!=="string" || !q.q.trim()){
-   throw new Error(`प्रश्न ${i+1} का सवाल सही नहीं है।`);
-  }
-  if(!Array.isArray(q.o) || q.o.length!==4 || q.o.some(x=>typeof x!=="string")){
-   throw new Error(`प्रश्न ${i+1} में ठीक चार विकल्प होने चाहिए।`);
-  }
-  if(!Number.isInteger(q.a) || q.a<0 || q.a>3){
-   throw new Error(`प्रश्न ${i+1} का सही उत्तर 0 से 3 के बीच होना चाहिए।`);
-  }
- });
+function validateQuestions(data){
+if(!data||!Array.isArray(data.questions)||data.questions.length===0)
+throw new Error("प्रश्न JSON में questions की सूची नहीं मिली।");
+
+data.questions.forEach((q,i)=>{
+if(!q||typeof q.q!=="string"||!Array.isArray(q.o)||q.o.length!==4||
+!q.o.every(x=>typeof x==="string")||
+!Number.isInteger(q.a)||q.a<0||q.a>3){
+throw new Error("प्रश्न संख्या "+(i+1)+" का फॉर्मेट गलत है।");
+}
+});
+}
+
+function getDuration(data){
+const value=Number(data.duration||settings.defaultDuration||30);
+return Number.isFinite(value)&&value>0?value:30;
 }
 
 async function init(){
- try{
-  const response=await fetch(jsonPath,{cache:"no-store"});
-  if(!response.ok){
-   throw new Error(`JSON फाइल नहीं मिली (${response.status})। जांचें: ${jsonPath}`);
-  }
+try{
+if(!Number.isInteger(setNumber)||setNumber<1)throw new Error("Set नंबर गलत है।");
 
-  const data=await response.json();
-  validateData(data);
+settings=await getJSON("data/settings.json");
+const chapterData=await getJSON(`data/${subject.toLowerCase()}/chapter-${chapter}.json`);
 
-  quizData=data;
-  questions=data.questions;
-  duration=Number(data.duration)||30;
-  if(duration<1)duration=30;
+validateQuestions(chapterData);
+allQuestions=chapterData.questions;
 
-  $("pageTitle").textContent=data.title||"Quiz Master";
-  $("pageSubtitle").textContent=
-   `${data.subject||subject} | Chapter ${data.chapter||chapter} | Quiz Set ${data.set||set}`;
+const perSet=Number(settings.questionsPerSet||30);
+if(!Number.isInteger(perSet)||perSet<1)throw new Error("settings.json में questionsPerSet गलत है।");
 
-  loadProgress();
+const start=(setNumber-1)*perSet;
+questions=allQuestions.slice(start,start+perSet);
 
-  $("loadingArea").classList.add("hidden");
+if(questions.length===0)throw new Error("इस सेट में कोई प्रश्न उपलब्ध नहीं है।");
 
-  if(finished){
-   // पहले से Submit Quiz को Result स्क्रीन पर खोलें।
-   finished=false;
-   finish();
-  }else{
-   $("quizArea").classList.remove("hidden");
-   render();
-   updateTimer();
-   tick=setInterval(updateTimer,1000);
-  }
+duration=getDuration(chapterData);
+storageKey=`quiz_${subject}_${chapter}_${setNumber}`;
 
- }catch(error){
-  showError("क्विज लोड नहीं हो पाया।\n"+error.message);
- }
+answers=Array(questions.length).fill(null);
+marked=Array(questions.length).fill(false);
+
+loadProgress();
+
+$("loading").style.display="none";
+$("quizArea").style.display="block";
+$("setTitle").textContent=(chapterData.title||"Chapter")+" - Quiz Set "+setNumber;
+
+if(finished){
+showResult();
+return;
 }
 
-function save(){
- if(finished)return;
+renderQuestion();
+renderPalette();
+updateCounts();
+startTimer();
 
- try{
-  localStorage.setItem(storageKey,JSON.stringify({
-   answers,marked,current,endTime,
-   questionCount:questions.length,
-   finished:false
-  }));
-  $("saveStatus").textContent="✓ उत्तर सेव हो गए";
- }catch(e){
-  $("saveStatus").textContent="सेव नहीं हो पाया";
- }
+}catch(error){
+showError(error.message||"JSON फाइल पढ़ने में समस्या हुई।");
+}
 }
 
 function loadProgress(){
- answers=Array(questions.length).fill(null);
- marked=Array(questions.length).fill(false);
+try{
+const saved=JSON.parse(localStorage.getItem(storageKey)||"null");
+if(!saved||saved.questionCount!==questions.length)return;
 
- try{
-  const raw=localStorage.getItem(storageKey);
-  if(!raw){
-   endTime=Date.now()+duration*60*1000;
-   return;
-  }
+if(Array.isArray(saved.answers)&&saved.answers.length===questions.length)
+answers=saved.answers.map(v=>Number.isInteger(v)&&v>=0&&v<4?v:null);
 
-  const data=JSON.parse(raw);
+if(Array.isArray(saved.marked)&&saved.marked.length===questions.length)
+marked=saved.marked.map(Boolean);
 
-  if(data.questionCount!==questions.length){
-   localStorage.removeItem(storageKey);
-   endTime=Date.now()+duration*60*1000;
-   return;
-  }
-
-  if(Array.isArray(data.answers)){
-   answers=questions.map((q,i)=>{
-    const v=data.answers[i];
-    return Number.isInteger(v)&&v>=0&&v<4?v:null;
-   });
-  }
-
-  if(Array.isArray(data.marked)){
-   marked=questions.map((q,i)=>!!data.marked[i]);
-  }
-
-  current=Number.isInteger(data.current)
-   ?Math.max(0,Math.min(data.current,questions.length-1)):0;
-
-  endTime=Number(data.endTime)||Date.now()+duration*60*1000;
-
-  // Submit की स्थिति भी Restore करें।
-  finished=data.finished===true;
-
- }catch(e){
-  localStorage.removeItem(storageKey);
-  endTime=Date.now()+duration*60*1000;
- }
+current=Math.min(Math.max(0,Number(saved.current)||0),questions.length-1);
+endTime=Number(saved.endTime)||0;
+finished=saved.finished===true;
+}catch(e){
+localStorage.removeItem(storageKey);
+}
 }
 
-function render(){
- if(!questions.length)return;
-
- const q=questions[current];
-
- $("counter").textContent=`प्रश्न ${current+1} / ${questions.length}`;
- $("qnum").textContent="QUESTION "+String(current+1).padStart(2,"0");
- $("question").textContent=q.q;
-
- const done=answers.filter(x=>x!==null).length;
- $("bar").style.width=(done/questions.length*100)+"%";
-
- $("prevBtn").disabled=current===0;
- $("nextBtn").disabled=current===questions.length-1;
-
- const opts=$("options");
- opts.innerHTML="";
-
- q.o.forEach((value,i)=>{
-  const div=document.createElement("div");
-  div.className="option"+(answers[current]===i?" selected":"");
-
-  const letter=document.createElement("span");
-  letter.className="letter";
-  letter.textContent="ABCD"[i];
-
-  const text=document.createElement("span");
-  text.textContent=value;
-
-  div.append(letter,text);
-
-  div.onclick=()=>{
-   if(finished)return;
-   answers[current]=i;
-   save();
-   render();
-  };
-
-  opts.appendChild(div);
- });
-
- const palette=$("palette");
- palette.innerHTML="";
-
- questions.forEach((question,i)=>{
-  const button=document.createElement("button");
-  button.className="pal";
-  button.textContent=i+1;
-
-  if(answers[i]!==null)button.classList.add("answered");
-  if(marked[i])button.classList.add("review");
-  if(i===current)button.classList.add("current");
-
-  button.onclick=()=>{
-   if(finished)return;
-   current=i;
-   save();
-   render();
-  };
-
-  palette.appendChild(button);
- });
+function saveProgress(){
+if(finished)return;
+localStorage.setItem(storageKey,JSON.stringify({
+questionCount:questions.length,
+answers,marked,current,endTime,finished:false
+}));
 }
 
-function next(){
- if(finished)return;
- if(current<questions.length-1){
-  current++;
-  save();
-  render();
- }
+function renderQuestion(){
+const q=questions[current];
+$("questionNumber").textContent="प्रश्न "+(current+1)+" / "+questions.length;
+$("questionCount").textContent="प्रश्न "+(current+1)+" / "+questions.length;
+$("questionText").textContent=q.q;
+$("reviewStatus").textContent=marked[current]?"★ बाद में देखें":"";
+
+$("options").innerHTML="";
+q.o.forEach((option,index)=>{
+const btn=document.createElement("button");
+btn.className="option"+(answers[current]===index?" selected":"");
+btn.textContent=String.fromCharCode(65+index)+". "+option;
+btn.onclick=()=>selectAnswer(index);
+$("options").appendChild(btn);
+});
+
+$("reviewButton").textContent=marked[current]?"★ समीक्षा हटाएँ":"★ बाद में देखें";
+$("progressBar").style.width=((current+1)/questions.length*100)+"%";
+
+renderPalette();
+updateCounts();
 }
 
-function previous(){
- if(finished)return;
- if(current>0){
-  current--;
-  save();
-  render();
- }
+function selectAnswer(index){
+if(finished)return;
+answers[current]=index;
+saveProgress();
+renderQuestion();
+}
+
+function previousQuestion(){
+if(current>0){current--;saveProgress();renderQuestion();}
+}
+
+function nextQuestion(){
+if(current<questions.length-1){current++;saveProgress();renderQuestion();}
 }
 
 function toggleReview(){
- if(finished)return;
- marked[current]=!marked[current];
- save();
- render();
+marked[current]=!marked[current];
+saveProgress();
+renderQuestion();
 }
 
-function submitQuiz(){
- if(finished)return;
- if(!confirm("क्या आप Quiz Submit करना चाहते हैं?"))return;
- finish();
+function renderPalette(){
+$("palette").innerHTML="";
+questions.forEach((q,index)=>{
+const btn=document.createElement("button");
+btn.textContent=index+1;
+if(answers[index]!==null)btn.classList.add("answered");
+if(marked[index])btn.classList.add("review");
+if(current===index)btn.classList.add("current");
+btn.onclick=()=>{current=index;saveProgress();renderQuestion();};
+$("palette").appendChild(btn);
+});
 }
 
-function finish(){
- if(finished)return;
-
- finished=true;
- clearInterval(tick);
-
- // Submit होते ही पूरा Result और उत्तर स्थायी रूप से सेव करें।
- try{
-  localStorage.setItem(storageKey,JSON.stringify({
-   answers,marked,current,endTime,
-   questionCount:questions.length,
-   finished:true
-  }));
- }catch(e){
-  alert("Result सेव नहीं हो पाया। कृपया फोन में Storage उपलब्धता जांचें।");
- }
-
- let correct=0,wrong=0,skip=0;
-
- questions.forEach((q,i)=>{
-  if(answers[i]===null)skip++;
-  else if(answers[i]===q.a)correct++;
-  else wrong++;
- });
-
- const percent=Math.round(correct/questions.length*100);
-
- $("quizArea").classList.add("hidden");
- $("resultArea").classList.remove("hidden");
-
- $("score").textContent=correct+" / "+questions.length;
- $("percent").textContent=percent+"% अंक";
- $("correct").textContent=correct;
- $("wrong").textContent=wrong;
- $("skipped").textContent=skip;
-
- let title="अच्छा प्रयास!";
- let icon="👍";
- let level="अभ्यास जारी रखें";
-
- if(percent>=90){
-  title="शानदार प्रदर्शन!";
-  icon="🏆";
-  level="उत्कृष्ट";
- }else if(percent>=70){
-  title="बहुत अच्छा!";
-  icon="🌟";
-  level="बहुत अच्छा";
- }else if(percent>=50){
-  title="अच्छा प्रयास!";
-  icon="👏";
-  level="अच्छा";
- }else{
-  title="और मेहनत की जरूरत है";
-  icon="💪";
-  level="अभ्यास जारी रखें";
- }
-
- $("resultTitle").textContent=title;
- $("resultIcon").textContent=icon;
- $("performance").textContent=level;
-
- activeFilter="all";
- document.querySelectorAll(".filter-btn").forEach((b,i)=>{
-  b.classList.toggle("active",i===0);
- });
-
- renderReview();
+function updateCounts(){
+const count=answers.filter(x=>x!==null).length;
+$("answeredCount").textContent="हल किए: "+count+" / "+questions.length;
 }
 
-function renderReview(){
- const list=$("reviewList");
- list.innerHTML="";
- let count=0;
-
- questions.forEach((q,i)=>{
-  const userAnswer=answers[i];
-
-  if(activeFilter==="wrong" && (userAnswer===null||userAnswer===q.a))return;
-  if(activeFilter==="correct" && userAnswer!==q.a)return;
-  if(activeFilter==="skip" && userAnswer!==null)return;
-
-  count++;
-
-  let status,cardClass,statusClass;
-
-  if(userAnswer===null){
-   status="उत्तर नहीं दिया";
-   cardClass="skip-card";
-   statusClass="skip";
-  }else if(userAnswer===q.a){
-   status="✓ सही उत्तर";
-   cardClass="correct-card";
-   statusClass="good";
-  }else{
-   status="✕ गलत उत्तर";
-   cardClass="wrong-card";
-   statusClass="bad";
-  }
-
-  const box=document.createElement("div");
-  box.className="explain "+cardClass;
-
-  const head=document.createElement("div");
-  head.className="review-head";
-
-  const label=document.createElement("span");
-  label.className="q-label";
-  label.textContent="प्रश्न "+(i+1);
-
-  const badge=document.createElement("span");
-  badge.className="status "+statusClass;
-  badge.textContent=status;
-
-  head.append(label,badge);
-
-  const question=document.createElement("div");
-  question.className="review-question";
-  question.textContent=q.q;
-
-  box.append(head,question);
-
-  q.o.forEach((option,j)=>{
-   const row=document.createElement("div");
-   row.className="review-option";
-
-   if(j===q.a){
-    row.classList.add("correct-option");
-   }else if(j===userAnswer){
-    row.classList.add("wrong-option");
-   }
-
-   const letter=document.createElement("span");
-   letter.className="letter";
-   letter.textContent="ABCD"[j];
-
-   const optionText=document.createElement("span");
-   optionText.textContent=option;
-
-   row.append(letter,optionText);
-
-   if(j===q.a){
-    const tick=document.createElement("b");
-    tick.textContent=" ✓";
-    row.append(tick);
-   }
-
-   if(j===userAnswer && userAnswer!==q.a){
-    const cross=document.createElement("b");
-    cross.textContent=" ✕";
-    row.append(cross);
-   }
-
-   box.append(row);
-  });
-
-  const info=document.createElement("div");
-  info.className="answer-info";
-
-  const your=document.createElement("div");
-  your.className="your";
-  your.textContent="आपका उत्तर: "+
-   (userAnswer===null?"उत्तर नहीं दिया":"("+ "ABCD"[userAnswer]+") "+q.o[userAnswer]);
-
-  const right=document.createElement("div");
-  right.className="right";
-  right.textContent="सही उत्तर: ("+"ABCD"[q.a]+") "+q.o[q.a];
-
-  info.append(your,right);
-  box.append(info);
-  list.append(box);
- });
-
- if(count===0){
-  const empty=document.createElement("div");
-  empty.className="no-result";
-  empty.textContent="इस श्रेणी में कोई प्रश्न नहीं है।";
-  list.append(empty);
- }
-}
-
-function setFilter(filter,button){
- activeFilter=filter;
-
- document.querySelectorAll(".filter-btn").forEach(b=>{
-  b.classList.remove("active");
- });
-
- button.classList.add("active");
- renderReview();
-}
-
-function restart(){
- if(!confirm("क्या आप फिर से नया Quiz शुरू करना चाहते हैं?"))return;
-
- localStorage.removeItem(storageKey);
- location.reload();
+function startTimer(){
+if(!endTime)endTime=Date.now()+duration*60*1000;
+saveProgress();
+updateTimer();
+timerInterval=setInterval(updateTimer,1000);
 }
 
 function updateTimer(){
- if(finished||!endTime)return;
+const remaining=Math.max(0,Math.ceil((endTime-Date.now())/1000));
+const min=Math.floor(remaining/60);
+const sec=remaining%60;
+$("timer").textContent=String(min).padStart(2,"0")+":"+String(sec).padStart(2,"0");
 
- const left=Math.max(0,Math.floor((endTime-Date.now())/1000));
+if(remaining<=0){
+clearInterval(timerInterval);
+finishQuiz();
+}
+}
 
- $("timer").textContent=
-  String(Math.floor(left/60)).padStart(2,"0")+":"+
-  String(left%60).padStart(2,"0");
+function confirmSubmit(){
+const unanswered=answers.filter(x=>x===null).length;
+if(confirm("क्या आप क्विज जमा करना चाहते हैं?\nबिना उत्तर वाले प्रश्न: "+unanswered)){
+finishQuiz();
+}
+}
 
- if(left<=0){
-  finish();
- }
+function finishQuiz(){
+if(finished)return;
+finished=true;
+clearInterval(timerInterval);
+localStorage.setItem(storageKey,JSON.stringify({
+questionCount:questions.length,
+answers,marked,current,endTime,finished:true
+}));
+showResult();
+}
+
+function showResult(){
+finished=true;
+clearInterval(timerInterval);
+$("quizArea").style.display="none";
+$("resultArea").style.display="block";
+
+let correctCount=0,wrongCount=0,skippedCount=0;
+
+questions.forEach((q,i)=>{
+if(answers[i]===null)skippedCount++;
+else if(answers[i]===q.a)correctCount++;
+else wrongCount++;
+});
+
+const penalty=Number(settings.negativeMarking||0);
+const score=Math.max(0,correctCount-(wrongCount*penalty));
+const percent=Math.round((score/questions.length)*100);
+
+$("score").textContent=Number(score.toFixed(2));
+$("percentage").textContent=percent+"%";
+$("correct").textContent=correctCount;
+$("wrong").textContent=wrongCount;
+$("skipped").textContent=skippedCount;
+$("total").textContent=questions.length;
+
+$("performance").textContent=percent>=80?"बहुत अच्छा! शानदार प्रदर्शन 🎉":
+percent>=60?"अच्छा प्रयास! ऐसे ही अभ्यास करते रहें।":
+percent>=40?"और अभ्यास की जरूरत है।":
+"दोबारा प्रयास करें, आप बेहतर कर सकते हैं।";
+
+filterReview("all");
+}
+
+function filterReview(type,button){
+document.querySelectorAll(".filter button").forEach(b=>b.classList.remove("active"));
+if(button)button.classList.add("active");
+else document.querySelector(".filter button").classList.add("active");
+
+$("reviewList").innerHTML="";
+
+questions.forEach((q,i)=>{
+const selected=answers[i];
+let status=selected===null?"skipped":selected===q.a?"correct":"wrong";
+if(type!=="all"&&type!==status)return;
+
+const item=document.createElement("div");
+item.className="review-item";
+
+const heading=document.createElement("b");
+heading.textContent="प्रश्न "+(i+1)+": "+q.q;
+item.appendChild(heading);
+
+q.o.forEach((option,index)=>{
+const line=document.createElement("div");
+line.style.padding="3px 0";
+line.textContent=String.fromCharCode(65+index)+". "+option;
+
+if(index===q.a){
+line.style.color="#16834a";
+line.style.fontWeight="bold";
+}
+if(index===selected&&selected!==q.a){
+line.style.color="#d93636";
+line.style.fontWeight="bold";
+}
+item.appendChild(line);
+});
+
+const result=document.createElement("p");
+result.className="small";
+result.style.fontWeight="bold";
+result.textContent=status==="correct"?"आपका उत्तर सही है":
+status==="wrong"?"आपका उत्तर गलत है":
+"आपने उत्तर नहीं दिया।";
+item.appendChild(result);
+
+$("reviewList").appendChild(item);
+});
+
+if(!$("reviewList").children.length)
+$("reviewList").textContent="इस श्रेणी में कोई प्रश्न नहीं है।";
+}
+
+function restartQuiz(){
+if(!confirm("क्या आप इस सेट को बिल्कुल नए सिरे से शुरू करना चाहते हैं?"))return;
+clearInterval(timerInterval);
+localStorage.removeItem(storageKey);
+location.reload();
 }
 
 init();
 </script>
-
 </body>
 </html>
